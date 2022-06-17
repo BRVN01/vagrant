@@ -1,0 +1,18 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "brvn01/freeipa_server"
+  config.vm.box_version = "0.1.0"
+
+    config.vm.define "freeipacentos7" do |node|
+      node.vm.provider :libvirt do |kvm|
+        kvm.memory = "3072"
+        kvm.cpus = "2"
+      end
+
+      node.vm.provision "Install-Expect-Vim", type: "shell", inline: <<-SHELL
+        sudo yum install expect vim -y
+      SHELL
+
+      node.vm.provision "shell", path: "freeipa.sh"
+    end
+end
