@@ -62,4 +62,4 @@ IFS=$SAVEIFS
 
 IP=$(ip addr show eth0 | grep -oE 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}')
 IP=$(sed "s/inet //" <<<${IP})
-sed -i "s/192.168.122.87\tidm.maddogs.br/$IP\tidm.maddogs.br/" /etc/hosts
+sed -i "s/192.168.122.87   idm.maddogs.br/$IP\tidm.maddogs.br/" /etc/hosts
