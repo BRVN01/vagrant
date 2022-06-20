@@ -3,10 +3,10 @@
 SAVEIFS=$IFS
 IFS=$(echo -en "\n\b")
 
-users="spawn ipa user-add ricardo --first=ricardo --last=andrade --email=ricardo@taskforce171.br
-spawn ipa user-add jose --first=jose --last=cavalcante --email=jose@taskforce171.br
-spawn ipa user-add roberto --first=roberto --last=silva --email=roberto@taskforce171.br
-spawn ipa user-add felipe --first=felipe --last=augusto --email=felipe@taskforce171.br"
+users="spawn ipa user-add ricardo --first=ricardo --last=andrade --email=ricardo@maddogs.br
+spawn ipa user-add jose --first=jose --last=cavalcante --email=jose@maddogs.br
+spawn ipa user-add roberto --first=roberto --last=silva --email=roberto@maddogs.br
+spawn ipa user-add felipe --first=felipe --last=augusto --email=felipe@maddogs.br"
 
 groups="ipa group-add --desc=group\ all allgroup
 ipa group-add-member allgroup --users=ricardo --users=roberto --users=jose --users=felipe"
