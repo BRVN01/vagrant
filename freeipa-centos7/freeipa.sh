@@ -9,7 +9,7 @@ spawn ipa user-add roberto --first=roberto --last=silva --email=roberto@taskforc
 spawn ipa user-add felipe --first=felipe --last=augusto --email=felipe@taskforce171.br"
 
 groups="ipa group-add --desc=group\ all allgroup
-ipa group-add-member allgroup --users=ricardo --users=bruno --users=jose --users=felipe"
+ipa group-add-member allgroup --users=ricardo --users=roberto --users=jose --users=felipe"
 
 log_in () {
 
