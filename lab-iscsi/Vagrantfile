@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
+
+  config.vm.define :iscsi_server do |name|
+    name.vm.hostname = "iscsi-server"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "3072"
+      kvm.cpus = 2
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+    end
+  end
+
+  config.vm.define :iscsi_client do |name|
+    name.vm.hostname = "iscsi-client"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 2
+    end
+  end
+end
