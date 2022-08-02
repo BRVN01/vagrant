@@ -1,0 +1,71 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/ubuntu2004"
+  
+# Gateway
+    config.vm.define :gw do |gwconf|
+      gwconf.vm.hostname = "gw"
+      gwconf.vm.provider "libvirt" do |kvm|
+        kvm.memory = "1024"
+        kvm.cpus = 1
+      end
+
+      # Network isolated_151
+      gwconf.vm.network "private_network", 
+        ip: '192.168.151.1',
+        libvirt__netmask: '255.255.255.0',
+        libvirt__network_name: 'isolated_151',
+        libvirt__forward_mode: 'none'
+
+      # Network isolated_161
+      gwconf.vm.network "private_network", 
+        ip: "192.168.161.1",
+        libvirt__netmask: "255.255.255.0",
+        libvirt__network_name: "isolated_161",
+        libvirt__forward_mode: "none"
+  
+      gwconf.vm.provision "Conf", type: "shell", inline: <<-SHELL
+        sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+        sysctl -p /etc/sysctl.conf 
+
+        echo -e "[Service]\nType=oneshot\nRemainAfterExit=yes\nExecStart=iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/my-startup-firewall.service
+        systemctl enable my-startup-firewall.service
+        systemctl start my-startup-firewall.service
+      SHELL
+  
+    end
+ 
+  # Host on network 1
+  
+    config.vm.define :net1 do |host1_net1_conf|
+      host1_net1_conf.vm.hostname = "net1"
+      host1_net1_conf.vm.provider "libvirt" do |kvm|
+        kvm.memory = "1024"
+        kvm.cpus = 1
+      end
+      host1_net1_conf.vm.network "private_network",
+        ip: "192.168.151.10",
+        libvirt__netmask: "255.255.255.0",
+        libvirt__network_name: "isolated_151",
+        libvirt__forward_mode: "none"
+    end
+  
+  
+  # Host on network 2
+  
+    config.vm.define :net2 do |host2_net2_conf|
+      host2_net2_conf.vm.hostname = "net2"
+      host2_net2_conf.vm.provider "libvirt" do |kvm|
+        kvm.memory = "1024"
+        kvm.cpus = 1
+      end
+      host2_net2_conf.vm.network "private_network", 
+        ip: "192.168.161.10",
+        libvirt__netmask: "255.255.255.0",
+        libvirt__network_name: "isolated_161",
+        libvirt__forward_mode: "none"
+    end
+  
+  
+  # End final.
+end
+  
