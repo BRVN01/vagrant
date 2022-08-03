@@ -24,6 +24,9 @@ Vagrant.configure("2") do |config|
         libvirt__forward_mode: "none"
   
       gwconf.vm.provision "Conf", type: "shell", inline: <<-SHELL
+
+        sudo apt install -y net-tools
+
         sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
         sysctl -p /etc/sysctl.conf 
 
@@ -49,6 +52,9 @@ Vagrant.configure("2") do |config|
 
       # Disable eth0
       host1_net1_conf.vm.provision "disable_eth0", type: "shell", inline: <<-SHELL
+
+        sudo apt install -y net-tools
+
         endereco=$(ls -l /sys/class/net/ | grep eth0 | grep -oE "[0-9]{4}:[0-9]{2}:[0-9]{2}.[0-9]")
         echo -e "SUBSYSTEM==<net<, ACTION==<add<,  RUN+=</bin/sh -c >echo 1 | /usr/bin/tee /sys/bus/pci/devices/$endereco/remove><" | sudo tee /etc/udev/rules.d/90-disable-eth0.rules
 
@@ -76,6 +82,9 @@ Vagrant.configure("2") do |config|
 
       # Disable eth0
       host2_net2_conf.vm.provision "disable_eth0", type: "shell", inline: <<-SHELL
+
+	sudo apt install -y net-tools
+
         endereco=$(ls -l /sys/class/net/ | grep eth0 | grep -oE "[0-9]{4}:[0-9]{2}:[0-9]{2}.[0-9]")
         echo -e "SUBSYSTEM==<net<, ACTION==<add<,  RUN+=</bin/sh -c >echo 1 | /usr/bin/tee /sys/bus/pci/devices/$endereco/remove><" | sudo tee /etc/udev/rules.d/90-disable-eth0.rules
 
