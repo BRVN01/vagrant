@@ -9,19 +9,21 @@ Vagrant.configure("2") do |config|
         kvm.cpus = 1
       end
 
-      # Network isolated_151
+      # Network net1
       gwconf.vm.network "private_network", 
-        ip: '192.168.151.1',
+        :ip => '192.168.150.1',
         libvirt__netmask: '255.255.255.0',
-        libvirt__network_name: 'isolated_151',
-        libvirt__forward_mode: 'none'
+        libvirt__network_name: 'net1',
+        libvirt__dhcp_enabled: false,
+        libvirt__forward_mode: 'open'
 
-      # Network isolated_161
+      # Network net2
       gwconf.vm.network "private_network", 
-        ip: "192.168.161.1",
+        :ip => "192.168.250.1",
         libvirt__netmask: "255.255.255.0",
-        libvirt__network_name: "isolated_161",
-        libvirt__forward_mode: "none"
+        libvirt__network_name: "net2",
+        libvirt__dhcp_enabled: false,
+        libvirt__forward_mode: "open"
   
       gwconf.vm.provision "Conf", type: "shell", inline: <<-SHELL
 
@@ -45,10 +47,11 @@ Vagrant.configure("2") do |config|
         kvm.cpus = 1
       end
       host1_net1_conf.vm.network "private_network",
-        ip: "192.168.151.10",
+        :ip => "192.168.150.10",
         libvirt__netmask: "255.255.255.0",
-        libvirt__network_name: "isolated_151",
-        libvirt__forward_mode: "none"
+        libvirt__network_name: "net1",
+        libvirt__dhcp_enabled: false,
+        libvirt__forward_mode: "open"
 
       # Disable eth0
       host1_net1_conf.vm.provision "disable_eth0", type: "shell", inline: <<-SHELL
@@ -75,10 +78,11 @@ Vagrant.configure("2") do |config|
         kvm.cpus = 1
       end
       host2_net2_conf.vm.network "private_network", 
-        ip: "192.168.161.10",
+        :ip => "192.168.250.10",
         libvirt__netmask: "255.255.255.0",
-        libvirt__network_name: "isolated_161",
-        libvirt__forward_mode: "none"
+        libvirt__network_name: "net2",
+        libvirt__dhcp_enabled: false,
+        libvirt__forward_mode: "open"
 
       # Disable eth0
       host2_net2_conf.vm.provision "disable_eth0", type: "shell", inline: <<-SHELL
