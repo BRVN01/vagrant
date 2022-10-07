@@ -9,7 +9,7 @@ cat >foo <<EOF
      Name-Real: $USER Tester
      Name-Email: $USER@foo.bar
      Expire-Date: 0
-     Passphrase: abc123
+     Passphrase: $USER
      # Do a commit here, so that we can later print "done" :-)
      %commit
      %echo done
