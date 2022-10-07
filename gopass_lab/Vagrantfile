@@ -13,8 +13,9 @@ Vagrant.configure("2") do |config|
       sudo apt install -y git gnupg2 rng-tools
       cd /tmp && wget https://github.com/gopasspw/gopass/releases/download/v1.14.9/gopass_1.14.9_linux_amd64.deb
       sudo dpkg -i /tmp/gopass_1.14.9_linux_amd64.deb
-      sudo useradd -m -p '$6$Db8nbJmuxGjH63Wo$J5TJhWnYli/Ff9xjbIVhL5XtF1QBc.b1uIoOVTeeFz03Sls2cAzaVr.7IoDWUoJX0VvFbiVM8R6OTZJ0iNpht/' -s /bin/bash jhon
-      sudo useradd -m -p '$6$.O9M.lyYPVqEEBly$3m/iJoYkfkGEJdAEe4rJrikqK2eOIImW3KPELIHuISNz0wZ5f0t.jf7MMb4n1E9fy7MLtgAL54uIuxglcFkwk1' -s /bin/bash bob
+      sudo useradd -m -p '$6$YTi42CPcITxCNNDw$6SPCUYzActVMJ6PgB.KcG29/Q9aQt/8vbKDs7gHglX6DREhGgpf3EN0ZQP6aMPKezMB0Imb4rICRglwOR1GBp1' -s /bin/bash jhon
+      sudo useradd -m -p '$6$Rxlqf93MrBT.aiTb$SZQmpYDz8e02tsoHXuYT4K5yIW4xY9huQK8mF4M9XEszTaa5GMZirMBjjdcUUtO97vHoupmkGuqteq9fPD/ex.' -s /bin/bash bob
+      sudo useradd -m -p '$6$jbdC9gi0KbaJYN34$mG4ZmQuooWZ8jG8R9mpCIJ1z2D.SohnBw1v7Hy42QazGHXi3AdHG.cMXS631xJu9.drdzggVBZR0PTxZOcuUh/' -s /bin/bash alice
       sudo mkdir /gpg
       sudo chmod 777 /gpg
     SHELL
@@ -23,5 +24,6 @@ Vagrant.configure("2") do |config|
   end
 end
 
-# Pass jhon = 123
-# Pass bob = 321
+# Pass jhon = jhon
+# Pass bob = bob
+# Pass alice = alice
