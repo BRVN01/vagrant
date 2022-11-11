@@ -11,6 +11,8 @@ Vagrant.configure("2") do |config|
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
+      sudo hostnamectl set-hostname mail.example.te
+      sudo echo 'mail.test.ze ' >> /etc/hosts
     SHELL
   end
 
@@ -26,6 +28,8 @@ Vagrant.configure("2") do |config|
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
+      sudo hostnamectl set-hostname mail.test.ze
+      sudo echo 'mail.example.te ' >> /etc/hosts
     SHELL
   end
   
