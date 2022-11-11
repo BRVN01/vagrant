@@ -8,6 +8,7 @@ Vagrant.configure("2") do |config|
       kvm.cpus = 1
     end
     name.vm.provision "Install-email-tools-example.te", type: "shell", inline: <<-SHELL
+      sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
     SHELL
@@ -22,6 +23,7 @@ Vagrant.configure("2") do |config|
       kvm.cpus = 1
     end
     name.vm.provision "Install-email-tools-test.ze", type: "shell", inline: <<-SHELL
+      sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
     SHELL
