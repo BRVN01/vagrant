@@ -1,0 +1,67 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
+
+  # Servidor mail.example.te
+  config.vm.define :mail_example_te do |name|
+    name.vm.hostname = "mail.example.te"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+    end
+    name.vm.provision "Install-email-tools-example.te", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y mutt
+      sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
+      sudo hostnamectl set-hostname mail.example.te
+      sudo echo -e ' mail.test.ze\n mailman.te' >> /etc/hosts
+    SHELL
+  end
+
+  # Servidor mail.test.ze
+  config.vm.define :mail_test_ze do |name|
+    name.vm.hostname = "mail.test.ze"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+    end
+    name.vm.provision "Install-email-tools-test.ze", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y mutt
+      sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
+      sudo hostnamectl set-hostname mail.test.ze
+      sudo echo -e ' mail.example.te\n mailman.te' >> /etc/hosts
+    SHELL
+  end
+  
+  
+  # Servidor Mailman:
+  config.vm.define :mailman_te do |name|
+    name.vm.hostname = "mailman.te"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+  end
+  name.vm.provision "Install-email-tools-mailman.te", type: "shell", inline: <<-SHELL
+    sudo apt update
+    sudo apt install -y mutt python3-dev python3-venv sassc lynx build-essential postgresql libpq-dev nginx mailutils
+
+    sudo mkdir /etc/mailman3
+    sudo mkdir /etc/nginx/certs
+
+    sudo openssl req -new -x509 -days 365 \
+    -nodes -out /etc/nginx/certs/cert.pem \
+    -keyout /etc/nginx/certs/key.pem \
+    -subj "/C=BR/ST=Sao Paulo/L=SP/O=mailman.te/OU=Dev/CN=localhost"
+  
+    sudo useradd -m -d /opt/mailman -s /usr/bin/bash mailman
+    sudo mkdir -p /opt/mailman/web/static
+    sudo mkdir /opt/mailman/web/logs
+
+    sudo chown -R mailman:mailman /opt/mailman
+    sudo chmod 755 /opt/mailman
+  
+    sudo hostnamectl set-hostname mailman.te
+    sudo echo -e ' mail.test.ze\n mail.example.te' >> /etc/hosts
+  SHELL
+  end
+end
