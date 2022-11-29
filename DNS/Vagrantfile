@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
     end
     name.vm.provision "Define hostname and install bind on Ubuntu", type: "shell", inline: <<-SHELL
       sudo apt update
-      sudo apt install -y bind9 bindutils
+      sudo apt install -y bind9 bind9-utils
       sudo hostnamectl set-hostname dns.ubuntu.te
     SHELL
   end
