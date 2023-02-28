@@ -21,6 +21,7 @@ Vagrant.configure("2") do |config|
     end
     client.vm.provision "ubuntu confs", type: "shell", inline: <<-SHELL
       sudo apt update
+      sudo apt dist-upgrade -y
       sudo apt install -y vim ubuntu-desktop unscd nfs-common
       sudo hostnamectl set-hostname client-nis
     SHELL
