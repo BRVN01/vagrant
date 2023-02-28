@@ -1,0 +1,28 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.define :nis do |nisserver|
+    nisserver.vm.box = "generic/ubuntu1604"
+    nisserver.vm.provider "libvirt" do |kvm|
+      kvm.memory = "2048"
+      kvm.cpus = 2
+    end
+    nisserver.vm.provision "Define hostname and install bind on Ubuntu", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y vim nfs-kernel-server
+      sudo hostnamectl set-hostname nis-server 
+    SHELL
+  end
+
+  config.vm.define :nisclient do |client|
+    client.vm.box = "generic/ubuntu2204"
+    client.vm.provider "libvirt" do |kvm|
+      kvm.memory = "3072"
+      kvm.cpus = 4
+    end
+    client.vm.provision "ubuntu confs", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y vim ubuntu-desktop unscd nfs-common
+      sudo hostnamectl set-hostname client-nis
+    SHELL
+  end
+end
