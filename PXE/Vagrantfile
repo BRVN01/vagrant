@@ -1,0 +1,15 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.define :pxe do |pxeserver|
+    pxeserver.vm.box = "generic/ubuntu2004"
+    pxeserver.vm.provider "libvirt" do |kvm|
+      kvm.memory = "2048"
+      kvm.cpus = 2
+    end
+    pxeserver.vm.provision "Define hostname and install bind on Ubuntu", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y isc-dhcp-server nfs-kernel-server tftpd-hpa pxelinux
+      sudo hostnamectl set-hostname pxe-server 
+    SHELL
+  end
+end
