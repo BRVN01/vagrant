@@ -20,3 +20,24 @@ end
 # https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#public-network-options
 # https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#management-network
 # https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#private-network-options
+
+
+## Outro método de subir uma VM:
+
+Vagrant.configure("2") do |config|
+    config.vm.define :pxeclient do |pxeclient|
+      pxeclient.vm.provider :libvirt do |domain|
+        # A linha abaixo impede a criação da rede padrão em 'vagrant-libvirt'.
+        domain.mgmt_attach = false
+        domain.storage :file, :size => '20G', :type => 'qcow2'
+        domain.boot 'network'
+        domain.boot 'hd'
+    end
+    
+    config.vm.network "private_network",
+        :mac => "525400bbffdd",
+        libvirt__network_name: "Open",
+        libvirt__dhcp_enabled: true,
+        libvirt__forward_mode: "none"
+    end
+end
