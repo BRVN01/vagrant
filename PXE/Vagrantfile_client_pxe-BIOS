@@ -14,3 +14,9 @@ end
 
 # Sobe com apenas uma única rede definindo qual o mac da interface.
 # Esse boot de pxe (pela rede) serve somente para modo BIOS.
+
+# Esse ex. usa o próprio libvirt para configurar a rede:
+# https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#networks
+# https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#public-network-options
+# https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#management-network
+# https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#private-network-options
