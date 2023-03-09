@@ -6,6 +6,7 @@
 #      uefi.driver = "kvm"
 #      uefi.machine_type = 'q35'
 #      uefi.loader = '/usr/share/ovmf/OVMF.fd'
+#      uefi.nvram = "/var/lib/libvirt/qemu/nvram/#{ENV['VAGRANT_MACHINE_NAME']}.fd"
 #      uefi.graphics_type = 'spice'
 #      uefi.video_type = 'qxl'
 #      uefi.channel :type => 'unix', :target_name => 'org.qemu.guest_agent.0', :target_type => 'virtio'
