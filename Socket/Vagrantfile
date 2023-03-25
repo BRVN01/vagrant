@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+Vagrant.configure("2") do |config|
+
+  config.vm.define :server do |name|
+    name.vm.box = "generic/ubuntu2004"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+    end
+    name.vm.provision "Some tasks on server", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y python3 python3-pip
+      sudo hostnamectl set-hostname server
+    SHELL
+  end
+
+  config.vm.define :client do |name|
+    name.vm.box = "generic/ubuntu2004"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+    end
+    name.vm.provision "Some tasks on client", type: "shell", inline: <<-SHELL
+      sudo apt update
+      sudo apt install -y python3 python3-pip
+      sudo hostnamectl set-hostname cliente
+    SHELL
+  end
+end
