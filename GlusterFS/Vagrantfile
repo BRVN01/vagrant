@@ -1,0 +1,44 @@
+Vagrant.configure("2") do |config|
+    config.vm.box = "generic/ubuntu2004"
+
+############################## Gluster 1 ##############################
+    config.vm.define :gluster1 do |gluster1|
+      gluster1.vm.hostname = "gluster1"
+      gluster1.vm.provider "libvirt" do |kvm|
+        kvm.memory = "2048"
+        kvm.cpus = 1
+        kvm.storage :file, :size => '10G'
+      end
+
+      gluster1.vm.provision "Conf", type: "shell", inline: <<-SHELL
+        apt install software-properties-common
+        add-apt-repository ppa:gluster/glusterfs-7 -y
+        apt install glusterfs-server
+      SHELL
+    end
+
+############################## Gluster 2 ##############################
+    config.vm.define :gluster2 do |gluster2|
+      gluster2.vm.hostname = "gluster2"
+      gluster2.vm.provider "libvirt" do |kvm|
+        kvm.memory = "2048"
+        kvm.cpus = 1
+        kvm.storage :file, :size => '10G'
+      end
+
+      gluster2.vm.provision "Conf", type: "shell", inline: <<-SHELL
+        apt install software-properties-common
+        add-apt-repository ppa:gluster/glusterfs-7 -y
+        apt install glusterfs-server
+      SHELL
+    end
+
+############################## Client ##############################
+    config.vm.define :clientgluster do |clientgluster|
+      clientgluster.vm.hostname = "clientgluster"
+      clientgluster.vm.provider "libvirt" do |kvm|
+        kvm.memory = "2048"
+        kvm.cpus = 1
+      end
+   end
+end
