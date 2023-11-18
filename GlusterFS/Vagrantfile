@@ -13,7 +13,7 @@ Vagrant.configure("2") do |config|
       gluster1.vm.provision "Conf", type: "shell", inline: <<-SHELL
         apt install software-properties-common
         add-apt-repository ppa:gluster/glusterfs-7 -y
-        apt install glusterfs-server
+        apt install glusterfs-server -y
       SHELL
     end
 
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       gluster2.vm.provision "Conf", type: "shell", inline: <<-SHELL
         apt install software-properties-common
         add-apt-repository ppa:gluster/glusterfs-7 -y
-        apt install glusterfs-server
+        apt install glusterfs-server -y
       SHELL
     end
 
