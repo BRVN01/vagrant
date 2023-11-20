@@ -1,24 +1,30 @@
+###########################################################
+#                                                         #
+# Só descomente quando for iniciar o ambiente do zero     #
+#                                                         # 
+###########################################################
 #
-resultado = system("virsh net-info vagrant-libvirt")
 #
-if $?.success?
-  puts "A rede vagrant-libvirt existe. Configurando entradas no DHCP..."
-  puts ""
-  # Configura dinamicamente o DHCP da rede vagrant-libvirt:
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />\" --live --config")
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />\" --live --config")
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />\" --live --config")
-else
-  puts "A rede vagrant-libvirt não existe. Criando..."
-  puts ""
-  system("virsh net-define ~/vagrant-libvirt.xml")
-  system("virsh net-start vagrant-libvirt")
-  puts "Configurando entradas no DHCP..."
-  puts ""
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />\" --live --config")
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />\" --live --config")
-  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />\" --live --config")
-end
+#resultado = system("virsh net-info vagrant-libvirt")
+##
+#if $?.success?
+#  puts "A rede vagrant-libvirt existe. Configurando entradas no DHCP..."
+#  puts ""
+#  # Configura dinamicamente o DHCP da rede vagrant-libvirt:
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />\" --live --config")
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />\" --live --config")
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />\" --live --config")
+#else
+#  puts "A rede vagrant-libvirt não existe. Criando..."
+#  puts ""
+#  system("virsh net-define ~/vagrant-libvirt.xml")
+#  system("virsh net-start vagrant-libvirt")
+#  puts "Configurando entradas no DHCP..."
+#  puts ""
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />\" --live --config")
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />\" --live --config")
+#  system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />\" --live --config")
+#end
 #
 Vagrant.configure("2") do |config|
     config.vm.box = "generic/ubuntu2004"
