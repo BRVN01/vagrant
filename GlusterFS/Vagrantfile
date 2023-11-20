@@ -8,12 +8,44 @@ Vagrant.configure("2") do |config|
         kvm.memory = "2048"
         kvm.cpus = 1
         kvm.storage :file, :size => '10G'
+        kvm.management_network_name = "vagrant-libvirt"
+        kvm.nic_model_type = "virtio"
+        kvm.management_network_mac = "52:54:00:fb:95:91"
       end
 
-      gluster1.vm.provision "Conf", type: "shell", inline: <<-SHELL
+      # Configura dinamicamente o DHCP da rede vagrant-libvirt:
+      #system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />\" --live --config")
+
+      # virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac='52:54:00:fb:95:91' ip='192.168.121.140' />" --live --config
+      # virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />" --live --config
+      # virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />" --live --config
+      ## Para alterar, basta:
+      # virsh net-edit vagrant-libvirt
+
+      gluster1.vm.provision "Installing-Gluster1", type: "shell", inline: <<-SHELL
+        # Installing GlusterFS
         apt install software-properties-common
         add-apt-repository ppa:gluster/glusterfs-7 -y
-        apt install glusterfs-server -y
+        apt install glusterfs-server chrony -y
+        # Configuring GLusterFS at startup 
+        sudo systemctl start glusterd.service glusterfssharedstorage.service glustereventsd.service gluster-ta-volume.service
+        sudo systemctl enable glusterd.service glusterfssharedstorage.service glustereventsd.service gluster-ta-volume.service
+        # Configuring /etc/hosts
+        sudo sed -i '/ubuntu2004.localdomain/d' /etc/hosts
+        echo -e "127.0.1.1   gluster1\n192.168.121.140 gluster1\n192.168.121.143 gluster2\n192.168.121.144   clientgluster" | sudo tee -a /etc/hosts
+        # Configuring Gluster Disk
+        sudo parted /dev/vdb mklabel gpt
+        echo -e "n\n1\n\n\nt\n\n0FC63DAF-8483-4772-8E79-3D69D8477DE4\nw" | sudo fdisk /dev/vdb
+        sudo mkfs.ext4 /dev/vdb1
+        sudo mkdir -p /data/glusterfs
+        echo "$(sudo blkid /dev/vdb1 | awk '{ print $2 }') /data/glusterfs ext4 defaults 1 2" | sudo tee -a /etc/fstab
+        sudo mount -a
+        # Configuring Time
+        sudo timedatectl set-ntp 0
+        sudo timedatectl set-timezone America/Sao_Paulo
+        sudo sed -i '/^pool/ s/^/#/' /etc/chrony/chrony.conf 
+        sudo echo 'pool pool.ntp.br iburst maxsources 4' | tee -a /etc/chrony/chrony.conf
+        sudo systemctl restart chrony
       SHELL
     end
 
@@ -24,12 +56,38 @@ Vagrant.configure("2") do |config|
         kvm.memory = "2048"
         kvm.cpus = 1
         kvm.storage :file, :size => '10G'
+        kvm.management_network_name = "vagrant-libvirt"
+        kvm.nic_model_type = "virtio"
+        kvm.management_network_mac = "52:54:00:fb:95:93"
       end
 
-      gluster2.vm.provision "Conf", type: "shell", inline: <<-SHELL
+      # Configura dinamicamente o DHCP da rede vagrant-libvirt:
+      #system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:93' ip='192.168.121.143' />\" --live --config")
+
+      gluster2.vm.provision "Installing-Gluster2", type: "shell", inline: <<-SHELL
+        # Installing GlusterFS
         apt install software-properties-common
         add-apt-repository ppa:gluster/glusterfs-7 -y
-        apt install glusterfs-server -y
+        apt install glusterfs-server chrony -y
+        # Configuring GLusterFS at startup 
+        sudo systemctl start glusterd.service glusterfssharedstorage.service glustereventsd.service gluster-ta-volume.service
+        sudo systemctl enable glusterd.service glusterfssharedstorage.service glustereventsd.service gluster-ta-volume.service
+        # Configuring /etc/hosts
+        sudo sed -i '/ubuntu2004.localdomain/d' /etc/hosts
+        echo -e "127.0.1.1   gluster2\n192.168.121.140 gluster1\n192.168.121.143 gluster2\n192.168.121.144   clientgluster" | sudo tee -a /etc/hosts
+        # Configuring Gluster Disk
+        sudo parted /dev/vdb mklabel gpt
+        echo -e "n\n1\n\n\nt\n\n0FC63DAF-8483-4772-8E79-3D69D8477DE4\nw" | sudo fdisk /dev/vdb
+        sudo mkfs.ext4 /dev/vdb1
+        sudo mkdir -p /data/glusterfs
+        echo "$(sudo blkid /dev/vdb1 | awk '{ print $2 }') /data/glusterfs ext4 defaults 1 2" | sudo tee -a /etc/fstab
+        sudo mount -a
+        # Configuring Time
+        sudo timedatectl set-ntp 0
+        sudo timedatectl set-timezone America/Sao_Paulo
+        sudo sed -i '/^pool/ s/^/#/' /etc/chrony/chrony.conf 
+        sudo echo 'pool pool.ntp.br iburst maxsources 4' | tee -a /etc/chrony/chrony.conf
+        sudo systemctl restart chrony
       SHELL
     end
 
@@ -39,6 +97,25 @@ Vagrant.configure("2") do |config|
       clientgluster.vm.provider "libvirt" do |kvm|
         kvm.memory = "2048"
         kvm.cpus = 1
+        kvm.management_network_name = "vagrant-libvirt"
+        kvm.nic_model_type = "virtio"
+        kvm.management_network_mac = "52:54:00:fb:95:94"
       end
+
+      # Configura dinamicamente o DHCP da rede vagrant-libvirt:
+      #system("virsh net-update vagrant-libvirt add ip-dhcp-host \"<host mac='52:54:00:fb:95:94' ip='192.168.121.144' />\" --live --config")
+
+      clientgluster.vm.provision "Installing-Gluster2", type: "shell", inline: <<-SHELL
+        apt install chrony -y
+        # Configuring /etc/hosts
+        sudo sed -i '/ubuntu2004.localdomain/d' /etc/hosts
+        echo -e "127.0.1.1   clientgluster\n192.168.121.140 gluster1\n192.168.121.143 gluster2\n192.168.121.144   clientgluster" | sudo tee -a /etc/hosts
+        # Configuring Time
+        sudo timedatectl set-ntp 0
+        sudo timedatectl set-timezone America/Sao_Paulo
+        sudo sed -i '/^pool/ s/^/#/' /etc/chrony/chrony.conf 
+        sudo echo 'pool pool.ntp.br iburst maxsources 4' | tee -a /etc/chrony/chrony.conf
+        sudo systemctl restart chrony
+      SHELL
    end
 end
