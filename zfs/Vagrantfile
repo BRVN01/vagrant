@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
+
+  config.vm.define :zfs_server do |name|
+    name.vm.hostname = "zfs-server"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "3072"
+      kvm.cpus = 2
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+      kvm.storage :file, :size => '10G'
+    end
+    name.vm.provision "Install-zfs", type: "shell", inline: <<-SHELL
+	  sudo apt update
+      sudo apt install zfsutils-linux -y
+    SHELL
+  end
+end
