@@ -1,3 +1,7 @@
+unless `virsh net-list --all`.include?("vagrant-libvirt")
+  system("./provision_network.sh") or abort("Falha ao criar rede vagrant-libvirt")
+end
+
 Vagrant.configure("2") do |config|
 
   # Trigger para rodar quando for executado um 'vagrant up'
@@ -48,13 +52,57 @@ Vagrant.configure("2") do |config|
       kvm.management_network_mac = "52:54:00:fb:95:90"
     end
     name.vm.provision "Install-email-tools-zion", type: "shell", inline: <<-SHELL
-      sudo apt update
-      sudo apt install -y dovecot-managesieved dovecot-sieve mutt
-      sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
-      sudo hostnamectl set-hostname mail.zion.com.br
-      sudo rm /etc/resolv.conf
-      sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
-      # Instale o 'postfix' manualmente por causa das perguntas
+      export DEBIAN_FRONTEND=noninteractive
+      echo -e "\n\nAtualizando index de pacotes...\n\n"
+      apt -qq update >/dev/null
+
+      echo -e "\n\nInstalando pacotes...\n\n"
+      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux >/dev/null
+
+      echo -e "\n\nCriando usuário do jhon...\n\n"
+      useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
+      
+      echo -e "\n\nDefinindo hostname e mailname...\n\n"
+      hostnamectl set-hostname mail.zion.com.br
+      echo 'zion.com.br' > /etc/mailname
+
+      echo -e "\n\nConfigurando DNS...\n\n"
+      rm /etc/resolv.conf
+      echo 'nameserver 192.168.121.2' > /etc/resolv.conf
+
+      echo -e "\n\nConfigurando mailbox_command e procmailrc...\n\n"
+      echo -e 'mailbox_command = procmail -a "$EXTENSION"' >> /etc/postfix/main.cf
+      echo 'DEFAULT=$HOME/Mail/inbox' > /etc/procmailrc
+
+      echo -e "\n\nConfigurando etc/hosts\n\n"
+      cat << EOF > /etc/hosts
+127.0.0.1 localhost
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+192.168.121.4 mail.zion.com.br mail
+EOF
+
+      echo -e '\n\nConfigurando Muttrc.d/folders.rc'
+      cat << EOF > /etc/Muttrc.d/folders.rc
+set hostname=zion.com.br
+set folder=~/Mail/
+set mbox=~/Mail/
+set spoolfile=~/Mail/inbox
+set record=~/Mail/outbox
+set postponed=~/Mail/postponed
+set autoedit=yes
+set edit_headers=yes
+set include=yes
+set confirmappend=no
+set delete=yes
+set mark_old=no
+color index green black ~N
+EOF
     SHELL
   end
 
@@ -70,17 +118,60 @@ Vagrant.configure("2") do |config|
     end
 
     name.vm.provision "Install-email-tools-notfound", type: "shell", inline: <<-SHELL
-      sudo apt update
-      sudo apt install -y dovecot-managesieved dovecot-sieve mutt
-      sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
-      sudo hostnamectl set-hostname mail.notfound.com.br
-      sudo rm /etc/resolv.conf
-      sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
-      # Instale o 'postfix' manualmente por causa das perguntas
+      export DEBIAN_FRONTEND=noninteractive
+      echo -e "\n\nAtualizando index de pacotes...\n\n"
+      apt -qq update >/dev/null
+
+      echo -e "\n\nInstalando pacotes...\n\n"
+      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux >/dev/null
+
+      echo -e "\n\nCriando usuário do bob...\n\n"
+      useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
+      
+      echo -e "\n\nDefinindo hostname e mailname...\n\n"
+      hostnamectl set-hostname mail.notfound.com.br
+      echo 'notfound.com.br' > /etc/mailname
+
+      echo -e "\n\nConfigurando DNS...\n\n"
+      rm /etc/resolv.conf
+      echo 'nameserver 192.168.121.2' > /etc/resolv.conf
+
+      echo -e "\n\nConfigurando mailbox_command e procmailrc...\n\n"
+      echo -e 'mailbox_command = procmail -a "$EXTENSION"' >> /etc/postfix/main.cf
+      echo 'DEFAULT=$HOME/Mail/inbox' > /etc/procmailrc
+
+      echo -e "\n\nConfigurando etc/hosts\n\n"
+      cat << EOF > /etc/hosts
+127.0.0.1 localhost
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+192.168.121.3 mail.notfound.com.br mail
+EOF
+
+      echo -e '\n\nConfigurando Muttrc.d/folders.rc'
+      cat << EOF > /etc/Muttrc.d/folders.rc
+set hostname=notfound.com.br
+set folder=~/Mail/
+set mbox=~/Mail/
+set spoolfile=~/Mail/inbox
+set record=~/Mail/outbox
+set postponed=~/Mail/postponed
+set autoedit=yes
+set edit_headers=yes
+set include=yes
+set confirmappend=no
+set delete=yes
+set mark_old=no
+color index green black ~N
+EOF
     SHELL
   end
 end
-
 
 
 
