@@ -174,7 +174,8 @@ EOF
 end
 
 
-
+#### Olhar:
+# https://github.com/BRVN01/docker/tree/main/dns_simple
 
 # Run container inside lab network:
 #docker network create \
