@@ -35,3 +35,17 @@ Vagrant.configure("2") do |config|
   
   # Instale o 'postfix' manualmente por causa das perguntas
 end
+
+# Run container inside lab network:
+#docker network create \
+#  --driver=bridge \
+#  --subnet=192.168.121.0/24 \
+#  --gateway=192.168.121.1 \
+#  --opt com.docker.network.bridge.name=virbr1 \
+#  dockernet
+
+#docker run -it --rm \
+#  --network dockernet \
+#  --ip 192.168.121.100 \
+#  alpine
+
