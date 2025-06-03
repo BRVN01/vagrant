@@ -1,8 +1,5 @@
-unless `virsh net-list --all`.include?("vagrant-libvirt")
-  system("./provision_network.sh") or abort("Falha ao criar rede vagrant-libvirt")
-end
-
 Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
 
   # Trigger para rodar quando for executado um 'vagrant up'
   config.trigger.before :up do |trigger|
@@ -12,34 +9,17 @@ Vagrant.configure("2") do |config|
       inline: <<-SHELL
         bash -c '
           if ! virsh net-info vagrant-libvirt > /dev/null 2>&1; then
-            echo "[Criando rede vagrant-libvirt...]"
-            $(pwd)/provision_network.sh
+            virsh net-define "$(pwd)/vagrant-libvirt.xml"
+            virsh net-autostart "vagrant-libvirt"
+            virsh net-start "vagrant-libvirt"
+
             virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
-            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:90\\" ip=\\"192.168.121.4\\" />" --live --config
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:94\\" ip=\\"192.168.121.4\\" />" --live --config
           fi
         '
     SHELL
     }
   end
-
-  # Trigger para rodar quando for executado um 'vagrant destroy'
-  config.trigger.after :destroy do |trigger|
-    trigger.name = "Remover rede vagrant-libvirt"
-    trigger.run = {
-      # ← isso garante que o shell vai interpretar os comandos
-      inline: <<-SHELL
-        bash -c '
-          if virsh net-info vagrant-libvirt > /dev/null 2>&1; then
-            virsh net-destroy vagrant-libvirt
-            virsh net-undefine vagrant-libvirt
-          fi
-        '
-      SHELL
-    }
-  end
-
-  # Todas as VMs usam a mesma imagem:
-  config.vm.box = "generic/ubuntu2004"
 
   ####################
   #       ZION       #
@@ -49,7 +29,7 @@ Vagrant.configure("2") do |config|
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
-      kvm.management_network_mac = "52:54:00:fb:95:90"
+      kvm.management_network_mac = "52:54:00:fb:95:94"
     end
     name.vm.provision "Install-email-tools-zion", type: "shell", inline: <<-SHELL
       export DEBIAN_FRONTEND=noninteractive
