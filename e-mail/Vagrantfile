@@ -1,40 +1,46 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/ubuntu2004"
 
-  config.vm.define :mail_example_te do |name|
-    name.vm.hostname = "mail.example.te"
+  config.vm.define :zion do |name|
+    name.vm.hostname = "mail.zion.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
     end
-    name.vm.provision "Install-email-tools-example.te", type: "shell", inline: <<-SHELL
+    name.vm.provision "Install-email-tools-zion", type: "shell", inline: <<-SHELL
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
-      sudo hostnamectl set-hostname mail.example.te
-      sudo echo 'mail.test.ze ' >> /etc/hosts
+      sudo hostnamectl set-hostname mail.zion.com.br
+
+      sudo rm /etc/resolv.conf
+      sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
     SHELL
   end
 
   # Instale o 'postfix' manualmente por causa das perguntas
 
-  config.vm.define :mail_test_ze do |name|
-    name.vm.hostname = "mail.test.ze"
+  config.vm.define :notfound do |name|
+    name.vm.hostname = "mail.notfound.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
     end
-    name.vm.provision "Install-email-tools-test.ze", type: "shell", inline: <<-SHELL
+    name.vm.provision "Install-email-tools-notfound", type: "shell", inline: <<-SHELL
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
-      sudo hostnamectl set-hostname mail.test.ze
-      sudo echo 'mail.example.te ' >> /etc/hosts
+      sudo hostnamectl set-hostname mail.notfound.com.br
+
+      sudo rm /etc/resolv.conf
+      sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
     SHELL
   end
   
   # Instale o 'postfix' manualmente por causa das perguntas
 end
+
+
 
 # Run container inside lab network:
 #docker network create \
