@@ -69,7 +69,7 @@ EOF
 
       echo -e '\n\nConfigurando Muttrc.d/folders.rc'
       cat << EOF > /etc/Muttrc.d/folders.rc
-set hostname=zion.com.br
+set hostname=mail.zion.com.br
 set folder=~/Mail/
 set mbox=~/Mail/
 set spoolfile=~/Mail/inbox
@@ -83,6 +83,14 @@ set delete=yes
 set mark_old=no
 color index green black ~N
 EOF
+
+      echo -e '\n\nParando o systemd-resolved'
+      systemctl stop systemd-resolved
+      systemctl disable systemd-resolved
+
+      echo -e '\n\nReiniciando'
+      reboot
+
     SHELL
   end
 
@@ -135,7 +143,7 @@ EOF
 
       echo -e '\n\nConfigurando Muttrc.d/folders.rc'
       cat << EOF > /etc/Muttrc.d/folders.rc
-set hostname=notfound.com.br
+set hostname=mail.notfound.com.br
 set folder=~/Mail/
 set mbox=~/Mail/
 set spoolfile=~/Mail/inbox
@@ -149,6 +157,15 @@ set delete=yes
 set mark_old=no
 color index green black ~N
 EOF
+
+      ip addr show eth0 | awk '/inet / {print $2}' | cut -d/ -f1
+
+      echo -e '\n\nParando o systemd-resolved'
+      systemctl stop systemd-resolved
+      systemctl disable systemd-resolved
+
+      echo -e '\n\nReiniciando'
+      reboot
     SHELL
   end
 end
