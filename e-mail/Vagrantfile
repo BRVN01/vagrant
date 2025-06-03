@@ -7,11 +7,14 @@ Vagrant.configure("2") do |config|
       # ← isso garante que o shell vai interpretar os comandos
       inline: <<-SHELL
         bash -c '
-          $(pwd)/provision_network.sh
-          virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
-          virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:90\\" ip=\\"192.168.121.4\\" />" --live --config
+          if ! virsh net-info vagrant-libvirt > /dev/null 2>&1; then
+            echo "[Criando rede vagrant-libvirt...]"
+            $(pwd)/provision_network.sh
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:90\\" ip=\\"192.168.121.4\\" />" --live --config
+          fi
         '
-      SHELL
+    SHELL
     }
   end
 
