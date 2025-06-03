@@ -1,44 +1,84 @@
 Vagrant.configure("2") do |config|
+
+  # Trigger para rodar quando for executado um 'vagrant up'
+  config.trigger.before :up do |trigger|
+    trigger.name = "Add rede vagrant-libvirt"
+    trigger.run = {
+      # ← isso garante que o shell vai interpretar os comandos
+      inline: <<-SHELL
+        bash -c '
+          $(pwd)/provision_network.sh
+          virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
+          virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:90\\" ip=\\"192.168.121.4\\" />" --live --config
+        '
+      SHELL
+    }
+  end
+
+  # Trigger para rodar quando for executado um 'vagrant destroy'
+  config.trigger.after :destroy do |trigger|
+    trigger.name = "Remover rede vagrant-libvirt"
+    trigger.run = {
+      # ← isso garante que o shell vai interpretar os comandos
+      inline: <<-SHELL
+        bash -c '
+          if virsh net-info vagrant-libvirt > /dev/null 2>&1; then
+            virsh net-destroy vagrant-libvirt
+            virsh net-undefine vagrant-libvirt
+          fi
+        '
+      SHELL
+    }
+  end
+
+  # Todas as VMs usam a mesma imagem:
   config.vm.box = "generic/ubuntu2004"
 
+  ####################
+  #       ZION       #
+  ####################
   config.vm.define :zion do |name|
     name.vm.hostname = "mail.zion.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
+      kvm.management_network_mac = "52:54:00:fb:95:90"
     end
     name.vm.provision "Install-email-tools-zion", type: "shell", inline: <<-SHELL
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
       sudo hostnamectl set-hostname mail.zion.com.br
-
       sudo rm /etc/resolv.conf
       sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
+      # Instale o 'postfix' manualmente por causa das perguntas
     SHELL
   end
 
-  # Instale o 'postfix' manualmente por causa das perguntas
-
+  ####################
+  #     notfound     #
+  ####################
   config.vm.define :notfound do |name|
     name.vm.hostname = "mail.notfound.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
+      kvm.management_network_mac = "52:54:00:fb:95:93"
     end
+
     name.vm.provision "Install-email-tools-notfound", type: "shell", inline: <<-SHELL
       sudo apt update
       sudo apt install -y dovecot-managesieved dovecot-sieve mutt
       sudo useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
       sudo hostnamectl set-hostname mail.notfound.com.br
-
       sudo rm /etc/resolv.conf
       sudo echo 'nameserver 192.168.121.2' > /etc/resolv.conf
+      # Instale o 'postfix' manualmente por causa das perguntas
     SHELL
   end
-  
-  # Instale o 'postfix' manualmente por causa das perguntas
 end
+
+
 
 
 
