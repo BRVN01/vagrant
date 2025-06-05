@@ -15,6 +15,15 @@ Vagrant.configure("2") do |config|
 
             virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
             virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:94\\" ip=\\"192.168.121.4\\" />" --live --config
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:95\\" ip=\\"192.168.121.5\\" />" --live --config
+
+          elif ! virsh net-info vagrant-libvirt | grep Active > /dev/null 2>&1; then
+            virsh net-autostart "vagrant-libvirt"
+            virsh net-start "vagrant-libvirt"
+
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:93\\" ip=\\"192.168.121.3\\" />" --live --config
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:94\\" ip=\\"192.168.121.4\\" />" --live --config
+            virsh net-update vagrant-libvirt add ip-dhcp-host "<host mac=\\"52:54:00:fb:95:95\\" ip=\\"192.168.121.5\\" />" --live --config         
           fi
         '
     SHELL
@@ -25,11 +34,12 @@ Vagrant.configure("2") do |config|
   #       ZION       #
   ####################
   config.vm.define :zion do |name|
-    name.vm.hostname = "mail.zion.com.br"
+    name.vm.hostname = "zion.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
       kvm.management_network_mac = "52:54:00:fb:95:94"
+      kvm.driver = "qemu" 
     end
     name.vm.provision "Install-email-tools-zion", type: "shell", inline: <<-SHELL
       export DEBIAN_FRONTEND=noninteractive
@@ -37,13 +47,13 @@ Vagrant.configure("2") do |config|
       apt -qq update >/dev/null
 
       echo -e "\n\nInstalando pacotes...\n\n"
-      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux >/dev/null
+      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux mailutils >/dev/null
 
       echo -e "\n\nCriando usuário do jhon...\n\n"
       useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' jhon
       
       echo -e "\n\nDefinindo hostname e mailname...\n\n"
-      hostnamectl set-hostname mail.zion.com.br
+      hostnamectl set-hostname zion.com.br
       echo 'zion.com.br' > /etc/mailname
 
       echo -e "\n\nConfigurando DNS...\n\n"
@@ -64,12 +74,12 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
-192.168.121.4 mail.zion.com.br mail
+192.168.121.4 zion.com.br mail
 EOF
 
       echo -e '\n\nConfigurando Muttrc.d/folders.rc'
       cat << EOF > /etc/Muttrc.d/folders.rc
-set hostname=mail.zion.com.br
+set hostname=zion.com.br
 set folder=~/Mail/
 set mbox=~/Mail/
 set spoolfile=~/Mail/inbox
@@ -98,11 +108,12 @@ EOF
   #     notfound     #
   ####################
   config.vm.define :notfound do |name|
-    name.vm.hostname = "mail.notfound.com.br"
+    name.vm.hostname = "notfound.com.br"
     name.vm.provider "libvirt" do |kvm|
       kvm.memory = "1024"
       kvm.cpus = 1
       kvm.management_network_mac = "52:54:00:fb:95:93"
+      kvm.driver = "qemu" 
     end
 
     name.vm.provision "Install-email-tools-notfound", type: "shell", inline: <<-SHELL
@@ -111,13 +122,13 @@ EOF
       apt -qq update >/dev/null
 
       echo -e "\n\nInstalando pacotes...\n\n"
-      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux >/dev/null
+      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux mailutils >/dev/null
 
       echo -e "\n\nCriando usuário do bob...\n\n"
       useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' bob
       
       echo -e "\n\nDefinindo hostname e mailname...\n\n"
-      hostnamectl set-hostname mail.notfound.com.br
+      hostnamectl set-hostname notfound.com.br
       echo 'notfound.com.br' > /etc/mailname
 
       echo -e "\n\nConfigurando DNS...\n\n"
@@ -138,12 +149,12 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 ff02::3 ip6-allhosts
-192.168.121.3 mail.notfound.com.br mail
+192.168.121.3 notfound.com.br mail
 EOF
 
       echo -e '\n\nConfigurando Muttrc.d/folders.rc'
       cat << EOF > /etc/Muttrc.d/folders.rc
-set hostname=mail.notfound.com.br
+set hostname=notfound.com.br
 set folder=~/Mail/
 set mbox=~/Mail/
 set spoolfile=~/Mail/inbox
@@ -168,6 +179,83 @@ EOF
       reboot
     SHELL
   end
+
+  ####################
+  #     stack     #
+  ####################
+  config.vm.define :stack do |name|
+    name.vm.hostname = "stack.com.br"
+    name.vm.provider "libvirt" do |kvm|
+      kvm.memory = "1024"
+      kvm.cpus = 1
+      kvm.management_network_mac = "52:54:00:fb:95:95"
+      kvm.driver = "qemu" 
+    end
+
+    name.vm.provision "Install-email-tools-stack", type: "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
+      echo -e "\n\nAtualizando index de pacotes...\n\n"
+      apt -qq update >/dev/null
+
+      echo -e "\n\nInstalando pacotes...\n\n"
+      apt -y -qq install dovecot-managesieved dovecot-sieve procmail mutt nmap tmux mailutils >/dev/null
+
+      echo -e "\n\nCriando usuário do bob...\n\n"
+      useradd -m -s /bin/bash -p '$6$hE1KC/fHlS4ZmmYg$uvlJce8oT79MsmtfCViJIj/oUvoQLSTOPHFGspMBGwrBekDdowJeMWRM5PrykI4fjWO6IDcGyV9LKyiCqtS0V0' alice
+      
+      echo -e "\n\nDefinindo hostname e mailname...\n\n"
+      hostnamectl set-hostname stack.com.br
+      echo 'stack.com.br' > /etc/mailname
+
+      echo -e "\n\nConfigurando DNS...\n\n"
+      rm /etc/resolv.conf
+      echo 'nameserver 192.168.121.2' > /etc/resolv.conf
+
+      echo -e "\n\nConfigurando mailbox_command e procmailrc...\n\n"
+      echo -e 'mailbox_command = procmail -a "$EXTENSION"' >> /etc/postfix/main.cf
+      echo 'DEFAULT=$HOME/Mail/inbox' > /etc/procmailrc
+
+      echo -e "\n\nConfigurando etc/hosts\n\n"
+      cat << EOF > /etc/hosts
+127.0.0.1 localhost
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+192.168.121.3 stack.com.br stack
+EOF
+
+      echo -e '\n\nConfigurando Muttrc.d/folders.rc'
+      cat << EOF > /etc/Muttrc.d/folders.rc
+set hostname=stack.com.br
+set folder=~/Mail/
+set mbox=~/Mail/
+set spoolfile=~/Mail/inbox
+set record=~/Mail/outbox
+set postponed=~/Mail/postponed
+set autoedit=yes
+set edit_headers=yes
+set include=yes
+set confirmappend=no
+set delete=yes
+set mark_old=no
+color index green black ~N
+EOF
+
+      ip addr show eth0 | awk '/inet / {print $2}' | cut -d/ -f1
+
+      echo -e '\n\nParando o systemd-resolved'
+      systemctl stop systemd-resolved
+      systemctl disable systemd-resolved
+
+      echo -e '\n\nReiniciando'
+      reboot
+    SHELL
+  end
+
 end
 
 
